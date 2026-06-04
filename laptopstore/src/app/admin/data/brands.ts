@@ -1,0 +1,77 @@
+import { Brand } from '../types/brand';
+
+export const initialBrands: Brand[] = [
+  {
+    id: 1,
+    name: 'Dell',
+    slug: 'dell',
+    desc: 'Thương hiệu laptop Mỹ, nổi tiếng dòng XPS và Inspiron',
+    website: 'https://dell.com',
+    active: true,
+    productCount: 1,
+  },
+  {
+    id: 2,
+    name: 'HP',
+    slug: 'hp',
+    desc: 'Hewlett-Packard, đa dạng phân khúc từ phổ thông đến cao cấp',
+    website: 'https://hp.com',
+    active: true,
+    productCount: 0,
+  },
+  {
+    id: 3,
+    name: 'Asus',
+    slug: 'asus',
+    desc: 'Thương hiệu Đài Loan, mạnh về gaming (ROG, TUF) và ultrabook',
+    website: 'https://asus.com',
+    active: true,
+    productCount: 2,
+  },
+  {
+    id: 4,
+    name: 'Lenovo',
+    slug: 'lenovo',
+    desc: 'Dòng ThinkPad huyền thoại và IdeaPad phổ thông',
+    website: 'https://lenovo.com',
+    active: true,
+    productCount: 1,
+  },
+  {
+    id: 5,
+    name: 'Apple',
+    slug: 'apple',
+    desc: 'MacBook với chip Apple Silicon M-series',
+    website: 'https://apple.com',
+    active: true,
+    productCount: 1,
+  },
+  {
+    id: 6,
+    name: 'MSI',
+    slug: 'msi',
+    desc: 'Chuyên gaming laptop hiệu năng cao',
+    website: 'https://msi.com',
+    active: true,
+    productCount: 1,
+  },
+  {
+    id: 7,
+    name: 'Acer',
+    slug: 'acer',
+    desc: 'Phổ thông đến gaming với dòng Nitro, Predator',
+    website: 'https://acer.com',
+    active: true,
+    productCount: 0,
+  },
+];
+
+export const brandColors = [
+  '#1e3a5f',
+  '#166534',
+  '#92400e',
+  '#5b21b6',
+  '#1d4ed8',
+  '#9f1239',
+  '#065f46',
+];
