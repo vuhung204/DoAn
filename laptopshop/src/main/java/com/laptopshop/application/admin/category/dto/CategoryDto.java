@@ -11,7 +11,6 @@ public class CategoryDto {
     private String        slug;
     private Long          parentId;
     private Integer       sortOrder;
-    /** isActive trong DB — tài liệu gọi là visible */
     private Boolean       visible;
     private Integer       productCount;
     private LocalDateTime createdAt;

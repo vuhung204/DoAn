@@ -33,12 +33,10 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         List<Category> all = categoryRepo.findAllOrdered();
         Map<Long, Integer> productCounts = buildProductCountMap(all);
 
-        // Nhóm children theo parentId
         Map<Long, List<Category>> childrenMap = all.stream()
                 .filter(c -> c.getParent() != null)
                 .collect(Collectors.groupingBy(c -> c.getParent().getId()));
 
-        // Chỉ build từ roots
         return all.stream()
                 .filter(c -> c.getParent() == null)
                 .map(c -> buildTreeDto(c, childrenMap, productCounts))
@@ -108,14 +106,12 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         if (req.getSortOrder() != null) category.setSortOrder(req.getSortOrder());
         if (req.getVisible() != null)   category.setIsActive(req.getVisible());
 
-        // Cập nhật slug nếu có
         if (req.getSlug() != null || req.getName() != null) {
             String newSlug = resolveSlug(req.getSlug(),
                     req.getName() != null ? req.getName() : category.getName(), id);
             category.setSlug(newSlug);
         }
 
-        // Cập nhật parent — validate không tạo cycle
         if (req.getParentId() != null) {
             if (req.getParentId().equals(id)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -160,10 +156,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
             }
         }
 
-        // force=true → xoá toàn bộ descendants trước (CascadeType.ALL đã xử lý qua JPA)
-        // nhưng để an toàn, xoá từ leaf lên root
         if (!descendantIds.isEmpty()) {
-            // Load và xoá từng descendant (JPA cascade handle children)
             descendantIds.forEach(dId -> categoryRepo.findById(dId)
                     .ifPresent(categoryRepo::delete));
         }
@@ -255,10 +248,6 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         return map;
     }
 
-    /**
-     * Resolve slug: dùng slug đã truyền nếu có, ngược lại sinh từ name.
-     * Validate unique (bỏ qua chính nó nếu excludeId != null).
-     */
     private String resolveSlug(String slugInput, String name, Long excludeId) {
         String slug = (slugInput != null && !slugInput.isBlank())
                 ? slugInput.trim().toLowerCase()
@@ -275,10 +264,6 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         return slug;
     }
 
-    /**
-     * Chuyển tên thành slug URL-friendly.
-     * Ví dụ: "Laptop Gaming" → "laptop-gaming"
-     */
     public static String toSlug(String name) {
         if (name == null) return "";
         String normalized = Normalizer.normalize(name, Normalizer.Form.NFD);

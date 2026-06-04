@@ -141,7 +141,6 @@ public class AdminInventoryServiceImpl implements AdminInventoryService {
     @Override
     @Transactional
     public ImportTicketDto createImport(CreateImportRequestDto req) {
-        // [PATCH] Staff chỉ được nhập kho cho chi nhánh mình
         storeAccessGuard.assertCanAccessStore(req.getCreatedBy(), req.getBranchId());
 
         InventoryTicket ticket = buildTicket(InventoryTicketType.IMPORT, req.getCreatedBy());
@@ -186,7 +185,6 @@ public class AdminInventoryServiceImpl implements AdminInventoryService {
     @Override
     @Transactional
     public ExportTicketDto createExport(CreateExportRequestDto req) {
-        // [PATCH] Staff chỉ được xuất kho từ chi nhánh mình
         storeAccessGuard.assertCanAccessStore(req.getCreatedBy(), req.getBranchId());
 
         InventoryTicket ticket = buildTicket(InventoryTicketType.EXPORT, req.getCreatedBy());
@@ -243,8 +241,6 @@ public class AdminInventoryServiceImpl implements AdminInventoryService {
                     "Chi nhánh nguồn và đích không được trùng nhau");
         }
 
-        // [PATCH] Staff chỉ được tạo phiếu chuyển từ chi nhánh mình
-        // Chi nhánh đích không giới hạn (có thể chuyển sang bất kỳ chi nhánh nào)
         storeAccessGuard.assertCanAccessStore(req.getCreatedBy(), req.getFromBranchId());
 
         InventoryTicket ticket = buildTicket(InventoryTicketType.TRANSFER, req.getCreatedBy());
@@ -289,7 +285,6 @@ public class AdminInventoryServiceImpl implements AdminInventoryService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Delta không được bằng 0");
         }
 
-        // [PATCH] Staff chỉ được điều chỉnh tồn kho chi nhánh mình
         storeAccessGuard.assertCanAccessStore(req.getStaffId(), req.getBranchId());
 
         int updated = storeInventoryRepo.adjustQuantity(

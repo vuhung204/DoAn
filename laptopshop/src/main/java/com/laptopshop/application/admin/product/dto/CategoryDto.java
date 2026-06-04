@@ -9,7 +9,6 @@ import lombok.Getter;
 public class CategoryDto {
     private Long id;
     private String name;
-    /** null nếu là root category */
     private Long parentId;
     private Integer sortOrder;
 }

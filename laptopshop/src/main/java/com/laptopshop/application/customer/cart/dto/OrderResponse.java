@@ -22,7 +22,7 @@ public class OrderResponse {
     private BigDecimal    shippingFee;
     private BigDecimal    totalAmount;
     private String        note;
-    private LocalDateTime orderedAt;   // ← đổi từ createdAt (khớp với FE)
+    private LocalDateTime orderedAt;
 
     // ── Items ─────────────────────────────────────────────────────────────────
     private List<OrderItemResponse> items;
@@ -85,7 +85,6 @@ public class OrderResponse {
         OrderResponse dto = new OrderResponse();
         dto.id             = order.getId();
         dto.orderCode      = order.getOrderCode();
-        // status lowercase để khớp OrderStatus type ở FE
         dto.status         = order.getStatus().name().toLowerCase();
         dto.subtotal       = order.getSubtotal();
         dto.discountAmount = order.getDiscountAmount();
@@ -117,7 +116,7 @@ public class OrderResponse {
         dto.totalAmount    = order.getTotalAmount();
         dto.note           = order.getNote();
         dto.orderedAt      = order.getOrderedAt();
-        dto.items          = itemDtos;              // ← dùng itemDtos đã build sẵn
+        dto.items          = itemDtos;
         dto.address        = AddressDto.from(order.getAddress());
         dto.payment        = PaymentDto.from(order.getPayment());
         return dto;

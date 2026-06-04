@@ -1,10 +1,5 @@
 import axios from 'axios';
 
-/**
- * Local axios instance (same style as your customers API file).
- * If you already have a shared instance exported elsewhere, you can replace this
- * with `import api from './path/to/sharedApi'` to reuse it.
- */
 const api = axios.create({
   baseURL: 'http://127.0.0.1:9765/api',
   timeout: 15_000,
@@ -16,7 +11,7 @@ api.interceptors.request.use(config => {
     const token = localStorage.getItem('access_token');
     if (token) config.headers = config.headers ?? {}, (config.headers.Authorization = `Bearer ${token}`);
   } catch {
-    // ignore
+
   }
   return config;
 });

@@ -12,8 +12,6 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// ── Types khớp BE DTOs ────────────────────────────────────────────────────
-
 export interface CustomerStatsSummaryDto {
   totalCustomers: number;
   newCustomers: number;

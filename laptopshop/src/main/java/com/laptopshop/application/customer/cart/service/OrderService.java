@@ -122,8 +122,6 @@ public class OrderService {
         orderRepository.save(order);
         cartItemRepository.deleteAllByUserId(userId);
 
-        // Không push notification khi PENDING vì user tự tạo đơn — họ đã biết
-
         return OrderResponse.from(order);
     }
 

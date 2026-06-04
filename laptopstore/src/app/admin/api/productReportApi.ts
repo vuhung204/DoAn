@@ -12,7 +12,6 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// ── Types khớp BE DTOs ────────────────────────────────────────────────────
 
 export interface ProductStatDto {
   label: string;

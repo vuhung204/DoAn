@@ -100,7 +100,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                 .orElseThrow(() -> new NoSuchElementException(
                         "Không tìm thấy đơn hàng #" + orderId));
 
-        // [PATCH] Staff chỉ được cập nhật đơn thuộc chi nhánh mình
         if (order.getStore() != null) {
             storeAccessGuard.assertCanAccessStore(staffId, order.getStore().getId());
         }
@@ -114,7 +113,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                     currentStatus.toFrontend(), newStatus.toFrontend()));
         }
 
-        // Assign chi nhánh khi xác nhận
         if (newStatus == OrderStatus.CONFIRMED) {
             if (req.getStoreId() == null) {
                 throw new IllegalArgumentException(
@@ -125,12 +123,10 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                     .orElseThrow(() -> new NoSuchElementException(
                             "Chi nhánh không tồn tại hoặc đã ngừng hoạt động: "
                                     + req.getStoreId()));
-            // [PATCH] Staff chỉ được assign đơn về chi nhánh mình
             storeAccessGuard.assertCanAccessStore(staffId, req.getStoreId());
             order.setStore(store);
         }
 
-        // Inventory adjustment
         if (newStatus == OrderStatus.SHIPPING) {
             adjustInventoryForOrder(order, -1);
         } else if (newStatus == OrderStatus.CANCELLED
@@ -138,7 +134,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
             adjustInventoryForOrder(order, +1);
         }
 
-        // Ghi OrderHistory
         OrderHistory history = new OrderHistory();
         history.setOrder(order);
         history.setOldStatus(currentStatus);
@@ -164,7 +159,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                 );
             }
         } catch (Exception e) {
-            // Không để lỗi notification fail transaction chính
+
         }
     }
 
@@ -189,7 +184,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                 .orElseThrow(() -> new NoSuchElementException(
                         "Không tìm thấy đơn hàng #" + orderId));
 
-        // [PATCH] Chỉ được tạo refund cho đơn thuộc chi nhánh mình
         if (order.getStore() != null) {
             storeAccessGuard.assertCanAccessStore(staffId, order.getStore().getId());
         }
@@ -235,7 +229,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                 .orElseThrow(() -> new NoSuchElementException(
                         "Không tìm thấy đơn hàng #" + orderId));
 
-        // [PATCH] Chỉ được ship đơn thuộc chi nhánh mình
         if (order.getStore() != null) {
             storeAccessGuard.assertCanAccessStore(staffId, order.getStore().getId());
         }
@@ -366,7 +359,6 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                         "Chi nhánh không tồn tại hoặc đã ngừng hoạt động: "
                                 + request.getStoreId()));
 
-        // [PATCH] Staff chỉ được tạo đơn tại chi nhánh mình
         storeAccessGuard.assertCanAccessStore(staffId, request.getStoreId());
 
         User user;
@@ -620,7 +612,9 @@ public class AdminOrderServiceImpl implements AdminOrderService {
                         newStatus.toFrontend()
                 );
             }
-        } catch (Exception e) { /* không fail transaction */ }
+        } catch (Exception e) {
+
+        }
     }
 
     private CellStyle buildHeaderStyle(Workbook workbook) {

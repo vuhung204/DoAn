@@ -116,7 +116,6 @@ public class AdminRefundServiceImpl implements AdminRefundService {
                     "Phải cung cấp orderId hoặc orderCode");
         }
 
-        // [PATCH] Chỉ được tạo refund cho đơn thuộc chi nhánh mình
         if (order.getStore() != null) {
             storeAccessGuard.assertCanAccessStore(req.getRequestedById(), order.getStore().getId());
         }
@@ -156,7 +155,6 @@ public class AdminRefundServiceImpl implements AdminRefundService {
     public RefundDetailDto approveRefund(Long refundId, ProcessRefundRequestDto req) {
         ReturnRequest rr = loadAndValidateTransition(refundId, ReturnStatus.APPROVED);
 
-        // [PATCH] Chỉ được approve refund thuộc chi nhánh mình
         assertStaffCanProcessRefund(rr, req.getProcessedById());
 
         ReturnStatus old = rr.getStatus();
@@ -178,7 +176,6 @@ public class AdminRefundServiceImpl implements AdminRefundService {
     public RefundDetailDto rejectRefund(Long refundId, ProcessRefundRequestDto req) {
         ReturnRequest rr = loadAndValidateTransition(refundId, ReturnStatus.REJECTED);
 
-        // [PATCH] Chỉ được reject refund thuộc chi nhánh mình
         assertStaffCanProcessRefund(rr, req.getProcessedById());
 
         ReturnStatus old = rr.getStatus();
@@ -200,7 +197,6 @@ public class AdminRefundServiceImpl implements AdminRefundService {
     public RefundDetailDto completeRefund(Long refundId, CompleteRefundRequestDto req) {
         ReturnRequest rr = loadAndValidateTransition(refundId, ReturnStatus.REFUNDED);
 
-        // [PATCH] Chỉ được complete refund thuộc chi nhánh mình
         assertStaffCanProcessRefund(rr, req.getProcessedById());
 
         ReturnStatus old = rr.getStatus();

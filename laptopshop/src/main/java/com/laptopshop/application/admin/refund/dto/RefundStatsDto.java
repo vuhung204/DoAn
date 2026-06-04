@@ -13,5 +13,5 @@ public class RefundStatsDto {
     /** key = frontend status string ("waiting","approved","done","rejected") */
     private Map<String, Long> countsByStatus;
     private BigDecimal        totalAmountRequested;
-    private BigDecimal        totalAmountRefunded;  // chỉ tính status = REFUNDED
+    private BigDecimal        totalAmountRefunded;
 }

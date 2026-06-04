@@ -30,10 +30,8 @@ public class VNPayUtils {
     private String returnUrl;
 
     public String createPaymentUrl(Long orderId, long amount, String orderInfo) {
-        // ✅ Fix 2: TxnRef unique theo thời gian
         String vnpTxnRef = orderId + "_" + System.currentTimeMillis();
 
-        // ✅ Timezone đúng cho Việt Nam
         String vnpCreateDate = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"))
                 .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String vnpExpireDate = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"))
@@ -64,7 +62,6 @@ public class VNPayUtils {
                 hashData.append("&");
                 query.append("&");
             }
-            // ✅ Fix 1: cả hashData và query đều dùng encoded value
             String encodedKey   = URLEncoder.encode(entry.getKey(),   StandardCharsets.US_ASCII);
             String encodedValue = URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII);
 
@@ -87,7 +84,6 @@ public class VNPayUtils {
 
         for (Map.Entry<String, String> entry : sorted.entrySet()) {
             if (!isFirst) hashData.append("&");
-            // ✅ Encode nhất quán với createPaymentUrl
             hashData.append(URLEncoder.encode(entry.getKey(),   StandardCharsets.US_ASCII))
                     .append("=")
                     .append(URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII));

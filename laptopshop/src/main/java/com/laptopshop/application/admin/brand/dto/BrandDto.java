@@ -19,7 +19,6 @@ public class BrandDto {
     private String description;
     private String website;
     private Boolean active;
-    /** Số sản phẩm thuộc brand (tất cả trạng thái) */
     private Integer productCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -13,9 +13,6 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// ── Types (khớp với BE DTOs) ─────────────────────────────────────────────
-
-/** Khớp BranchInventoryDto */
 export interface BranchInventoryDto {
   branchId: number;
   name: string;
@@ -25,7 +22,6 @@ export interface BranchInventoryDto {
   inventoryValue: number;   // BigDecimal → number, VND tuyệt đối
 }
 
-/** Khớp InventoryOverviewDto */
 export interface InventoryOverviewDto {
   branches: BranchInventoryDto[];
   totalProducts: number;
@@ -34,19 +30,17 @@ export interface InventoryOverviewDto {
   totalValue: number;
 }
 
-/** Khớp ProductInventoryDto */
 export interface ProductInventoryDto {
   productId: number;
   sku: string;
   name: string;
-  stockByBranch: Record<string, number>;  // branchId(string) → quantity
+  stockByBranch: Record<string, number>;  
   totalStock: number;
   minStock: number;
   lowStock: boolean;
   estimatedValue: number;
 }
 
-/** Khớp InventoryTicketLineDto */
 export interface TicketLineDto {
   productId: number | null;
   sku: string | null;
@@ -56,7 +50,6 @@ export interface TicketLineDto {
   lineTotal: number | null;
 }
 
-/** Khớp ImportTicketDto */
 export interface ImportTicketDto {
   ticketId: number;
   branchId: number | null;
@@ -69,7 +62,6 @@ export interface ImportTicketDto {
   createdBy: number | null;
 }
 
-/** Khớp ExportTicketDto */
 export interface ExportTicketDto {
   ticketId: number;
   branchId: number | null;
@@ -82,7 +74,6 @@ export interface ExportTicketDto {
   createdBy: number | null;
 }
 
-/** Khớp TransferTicketDto */
 export interface TransferTicketDto {
   ticketId: number;
   fromBranchId: number | null;
@@ -97,7 +88,6 @@ export interface TransferTicketDto {
   createdBy: number | null;
 }
 
-/** Khớp InventoryAlertDto */
 export interface InventoryAlertDto {
   productId: number;
   sku: string;
@@ -110,7 +100,6 @@ export interface InventoryAlertDto {
   note: string | null;
 }
 
-/** Khớp InventoryHistoryDto */
 export interface InventoryHistoryDto {
   id: number;
   productId: number | null;
@@ -123,12 +112,11 @@ export interface InventoryHistoryDto {
   note: string | null;
 }
 
-/** Khớp PageDto<T> */
 export interface PageDto<T> {
   content: T[];
   totalElements: number;
   totalPages: number;
-  number: number;   // 0-indexed
+  number: number;   
   size: number;
   first: boolean;
   last: boolean;

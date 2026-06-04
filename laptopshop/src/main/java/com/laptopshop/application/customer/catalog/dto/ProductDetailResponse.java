@@ -28,12 +28,12 @@ public class ProductDetailResponse {
     private String os;
     private BigDecimal weightKg;
     private Integer batteryWh;
-    private String ports;       // thêm mới
-    private String color;       // thêm mới
-    private Double avgRating;   // thêm mới
-    private Long reviewCount;   // thêm mới
-    private Integer stockQuantity; // thêm mới
-    private Boolean inStock;    // thêm mới
+    private String ports;
+    private String color;
+    private Double avgRating;
+    private Long reviewCount;
+    private Integer stockQuantity;
+    private Boolean inStock;
 
     public static ProductDetailResponse from(Product product) {
         ProductDetailResponse dto = new ProductDetailResponse();
@@ -61,8 +61,8 @@ public class ProductDetailResponse {
             dto.os = product.getSpec().getOs();
             dto.weightKg = product.getSpec().getWeightKg();
             dto.batteryWh = product.getSpec().getBatteryWh();
-            dto.ports = product.getSpec().getPorts();   // thêm mới
-            dto.color = product.getSpec().getColor();   // thêm mới
+            dto.ports = product.getSpec().getPorts();
+            dto.color = product.getSpec().getColor();
         }
 
         // Rating & Review — thêm mới

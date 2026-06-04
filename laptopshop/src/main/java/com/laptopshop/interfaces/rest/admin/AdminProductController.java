@@ -25,7 +25,6 @@ public class AdminProductController {
 
     private final AdminProductService productService;
 
-    // PHẢI đặt trước /{id}
     @GetMapping("/filters/meta")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','STORE_MANAGER','SALES_STAFF')")
     public ResponseEntity<ProductFiltersMetaDto> getFiltersMeta() {

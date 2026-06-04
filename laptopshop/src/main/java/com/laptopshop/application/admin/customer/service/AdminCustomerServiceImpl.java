@@ -143,7 +143,6 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
                             ? u.getCreatedAt().toLocalDate() : null;
                     String ctype   = classifyType(spent, joined);
 
-                    // filter by type nếu có
                     return new CustomerListDto(
                             u.getId(),
                             u.getFullName(),
@@ -293,7 +292,6 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
         log.info("Password reset for customer {} ({})", id, user.getEmail());
 
         // Production: trả emailSent=true, tempPassword=null
-        // Dev/staging: có thể trả tempPassword để test
         return new ResetPasswordResponseDto(true, null);
     }
 
@@ -314,7 +312,7 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
                     writeListSheet(wb, req, hs, ns);
                     // TODO: chi tiết từng khách nếu cần
                 }
-                default -> writeListSheet(wb, req, hs, ns); // LIST
+                default -> writeListSheet(wb, req, hs, ns);
             }
 
             wb.write(out);
@@ -375,7 +373,6 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
             createCell(row, 2, (String) r[2], null);
             createCell(row, 3, r[3] != null ? (String) r[3] : "", null);
             createCell(row, 4, r[4] != null ? r[4].toString() : "", null);
-            // created_at
             String joined = "";
             if (r[5] instanceof java.sql.Timestamp ts)
                 joined = ts.toLocalDateTime().format(dtFmt);

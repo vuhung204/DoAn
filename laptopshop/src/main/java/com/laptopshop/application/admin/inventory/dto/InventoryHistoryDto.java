@@ -12,8 +12,8 @@ public class InventoryHistoryDto {
     private int           delta;
     /** IMPORT|EXPORT|ADJUSTMENT|SALE|TRANSFER_OUT|TRANSFER_IN|ORDER_DEDUCT|RETURN_IN */
     private String        actionType;
-    private String        refId;      // batch_ref hoặc order_id
+    private String        refId;
     private LocalDateTime createdAt;
-    private Long          createdBy;  // staff_id
+    private Long          createdBy;
     private String        note;
 }

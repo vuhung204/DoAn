@@ -25,7 +25,7 @@ public class EmailService {
 
             helper.setTo(toEmail);
             helper.setSubject("[LaptopShop] Mã xác nhận đặt lại mật khẩu");
-            helper.setText(buildOtpEmailHtml(otp), true); // true = HTML
+            helper.setText(buildOtpEmailHtml(otp), true);
 
             mailSender.send(message);
         } catch (Exception e) {

@@ -9,14 +9,14 @@ import java.math.BigDecimal;
 public class CartItemResponse {
     private Long productId;
     private String productName;
-    private String brandName;   // thêm mới
+    private String brandName;
     private String image;
     private BigDecimal unitPrice;
     private Integer quantity;
     private BigDecimal totalPrice;
-    private String cpu;         // thêm mới
-    private String ram;         // thêm mới
-    private String storage;     // thêm mới
+    private String cpu;
+    private String ram;
+    private String storage;
 
     public static CartItemResponse from(CartItem item) {
         CartItemResponse dto = new CartItemResponse();

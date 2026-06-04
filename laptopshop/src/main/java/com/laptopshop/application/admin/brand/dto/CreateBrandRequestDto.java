@@ -16,8 +16,7 @@ public class CreateBrandRequestDto {
     private String name;
 
     /**
-     * Slug URL-friendly (tuỳ chọn — nếu null server tự generate từ name).
-     * Ví dụ: "dell", "hp", "lenovo"
+     * Slug URL-friendly.
      */
     @Size(max = 255)
     private String slug;

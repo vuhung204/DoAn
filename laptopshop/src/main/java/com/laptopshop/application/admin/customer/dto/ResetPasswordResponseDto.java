@@ -12,6 +12,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ResetPasswordResponseDto {
     private Boolean emailSent;
-    /** null trong production — chỉ dùng nội bộ dev */
     private String tempPassword;
 }

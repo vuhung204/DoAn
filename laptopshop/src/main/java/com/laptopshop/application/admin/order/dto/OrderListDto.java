@@ -18,12 +18,12 @@ public class OrderListDto {
     private String     customerName;
     private String     customerPhone;
     private String     customerEmail;
-    private String     storeName;        // FE: order.branch = o.storeName
+    private String     storeName;
     private BigDecimal totalAmount;
     private int        itemCount;
-    private String     paymentMethod;    // FE: order.payment
-    private String     payStatus;        // FE: order.payStatus
-    private String     status;           // frontend string: "pending","done"...
-    private String     orderedAt;        // FE cần string "2026-04-05 10:30"
+    private String     paymentMethod;
+    private String     payStatus;
+    private String     status;
+    private String     orderedAt;
 }
 

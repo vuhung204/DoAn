@@ -19,7 +19,7 @@ public class AdminLoginResponse {
         private String fullName;
         private String email;
         private String phone;
-        private String role;        // tên role, ví dụ: SUPER_ADMIN
+        private String role;
         private Long   storeId;
         private String storeName;
     }

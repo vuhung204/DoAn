@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter @Setter
 public class ResetPasswordRequest {
     private String email;
-    private String resetToken; // token nhận từ step 2
+    private String resetToken;
     private String newPassword;
 }

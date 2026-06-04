@@ -7,7 +7,7 @@ import lombok.Getter;
 public class AdjustStockRequestDto {
     @NotNull private Long   productId;
     @NotNull private Long   branchId;
-    @NotNull private Integer delta;   // dương = nhập thêm, âm = giảm
+    @NotNull private Integer delta;
     private String reason;
     private Long   staffId;
 }

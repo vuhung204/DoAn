@@ -20,12 +20,11 @@ interface FormState {
   type: PromoType;
   discount: string;
   maxDiscount: string;
-  // BE fields: minOrderAmount & minQty (FE mock dùng conditionType/Value — đã fix)
   conditionType: 'none' | 'min_price' | 'min_qty';
   conditionValue: string;
   startDate: string;
   endDate: string;
-  maxUses: string;           // "" = unlimited (null BE), 0 = unlimited (mock)
+  maxUses: string;          
   maxUsesPerUser: string;
   applyMode: 'all' | 'select';
   productIds: number[];

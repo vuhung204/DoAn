@@ -13,12 +13,9 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// ── Types (khớp với BE DTOs) ─────────────────────────────────────────────
-
 export type PromoType   = 'percent' | 'fixed' | 'free_ship';
 export type PromoStatus = 'active' | 'inactive' | 'upcoming' | 'expired';
 
-/** Khớp PromotionListDto */
 export interface PromotionListDto {
   id: number;
   code: string;
@@ -33,7 +30,6 @@ export interface PromotionListDto {
   status: PromoStatus;
 }
 
-/** Khớp PromotionDetailDto */
 export interface PromotionDetailDto {
   id: number;
   code: string;
@@ -58,7 +54,6 @@ export interface PromotionDetailDto {
   createdAt: string | null;
 }
 
-/** Khớp PageDto<PromotionListDto> */
 export interface PromotionPageDto {
   content: PromotionListDto[];
   totalElements: number;
@@ -69,7 +64,6 @@ export interface PromotionPageDto {
   last: boolean;
 }
 
-/** Khớp PromotionValidateResponseDto */
 export interface ValidateCodeDto {
   valid: boolean;
   message: string;
@@ -84,8 +78,8 @@ export interface CreatePromotionBody {
   type: PromoType;           // percent | fixed | free_ship
   discount: number;
   maxDiscount?: number;
-  minOrderAmount?: number;   // BE field: minOrderAmount (FE mock dùng conditionValue)
-  minQty?: number;           // BE field: minQty
+  minOrderAmount?: number;   
+  minQty?: number;           
   startDate: string;         // "YYYY-MM-DD"
   endDate: string;
   maxUses?: number;          // null/0 = unlimited

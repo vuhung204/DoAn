@@ -13,9 +13,6 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// ── Types (khớp với BE DTOs) ─────────────────────────────────────────────
-
-/** Status string theo quy ước BE service (toFrontend mapping) */
 export type RefundStatus =
   | 'waiting'   // PENDING
   | 'approved'  // APPROVED
@@ -24,7 +21,6 @@ export type RefundStatus =
   | 'received'  // RECEIVED
   | 'cancelled'; // CANCELLED
 
-/** Khớp RefundListDto */
 export interface RefundListDto {
   id: number;
   orderCode: string;
@@ -35,7 +31,6 @@ export interface RefundListDto {
   requestedAt: string;   // ISO datetime string
 }
 
-/** Khớp RefundDetailDto */
 export interface RefundDetailDto {
   id: number;
   orderCode: string;
@@ -53,7 +48,6 @@ export interface RefundDetailDto {
   paymentMethod: string | null; // BANK | CASH | MOMO | VNPAY
 }
 
-/** Khớp RefundStatsDto */
 export interface RefundStatsDto {
   totalRequests: number;
   countsByStatus: Record<string, number>; // key = frontend status string
@@ -61,7 +55,6 @@ export interface RefundStatsDto {
   totalAmountRefunded: number;
 }
 
-/** Khớp PageDto<RefundListDto> từ BE */
 export interface RefundPageDto {
   content: RefundListDto[];
   totalElements: number;

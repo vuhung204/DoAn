@@ -13,22 +13,18 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// ── Types (khớp với BE DTOs) ─────────────────────────────────────────────
-
-/** Khớp CategoryDto */
 export interface CategoryDto {
   id: number;
   name: string;
   slug: string;
   parentId: number | null;
-  sortOrder: number;       // BE field: sortOrder (mock dùng "order" — đã fix)
-  visible: boolean;        // BE field: visible (từ isActive)
+  sortOrder: number;      
+  visible: boolean;        
   productCount: number;
   createdAt: string | null;
   updatedAt: string | null;
 }
 
-/** Khớp CategoryTreeDto */
 export interface CategoryTreeDto {
   id: number;
   name: string;
@@ -38,12 +34,11 @@ export interface CategoryTreeDto {
   children: CategoryTreeDto[];
 }
 
-/** Khớp PageDto<CategoryDto> */
 export interface CategoryPageDto {
   content: CategoryDto[];
   totalElements: number;
   totalPages: number;
-  number: number;   // 0-indexed
+  number: number;   
   size: number;
   first: boolean;
   last: boolean;

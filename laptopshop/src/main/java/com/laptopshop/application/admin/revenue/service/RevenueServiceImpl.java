@@ -144,13 +144,11 @@ public class RevenueServiceImpl implements RevenueService {
         if (raw == null) return "";
         return switch (mode.toLowerCase()) {
             case "month" -> {
-                // raw = "2026-03"
                 String[] parts = raw.toString().split("-");
                 yield "T" + Integer.parseInt(parts[1]) + "/" + parts[0];
             }
-            case "year" -> raw.toString();  // "2026"
+            case "year" -> raw.toString();
             default -> {
-                // raw = java.sql.Date
                 LocalDate d = (raw instanceof java.sql.Date jsd)
                         ? jsd.toLocalDate()
                         : LocalDate.parse(raw.toString());

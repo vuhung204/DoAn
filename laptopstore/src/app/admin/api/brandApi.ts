@@ -12,14 +12,12 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// ── Types khớp BE DTOs ────────────────────────────────────────────────────
-
 export interface BrandDto {
   id: number;
   name: string;
   slug: string;
   logoUrl: string | null;
-  description: string | null;  // FE dùng 'desc' → map sang 'description'
+  description: string | null;
   website: string | null;
   active: boolean;
   productCount: number;

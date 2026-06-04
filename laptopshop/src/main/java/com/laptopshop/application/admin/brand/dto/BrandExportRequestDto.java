@@ -11,7 +11,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class BrandExportRequestDto {
-    /** "xlsx" | "csv" — default xlsx */
     private String format = "xlsx";
     private String q;
     private Boolean active;

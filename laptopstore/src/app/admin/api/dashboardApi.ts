@@ -13,8 +13,6 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// ── Types (khớp với BE DTOs) ─────────────────────────────────────────────
-
 export interface DashboardStatDto {
   label: string;
   value: string;

@@ -29,7 +29,7 @@ public class AdminCreateOrderResult {
     private BigDecimal totalAmount;
 
     private String  paymentMethod;
-    private String  status;       // "confirmed" — đơn tại quầy xác nhận ngay
+    private String  status;
     private String  note;
-    private String  orderedAt;    // "yyyy-MM-dd HH:mm"
+    private String  orderedAt;
 }

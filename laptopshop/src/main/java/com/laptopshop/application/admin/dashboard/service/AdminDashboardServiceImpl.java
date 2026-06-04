@@ -40,7 +40,6 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     private final StoreInventoryRepository storeInventoryRepository;
     private final UserRepository userRepository;
 
-    // FIX: Xóa DELIVERED khỏi map — enum Java không có giá trị này
     private static final Map<OrderStatus, String> STATUS_COLORS = Map.of(
             OrderStatus.PENDING,    "#9ca3af",
             OrderStatus.CONFIRMED,  "#2563eb",
@@ -65,7 +64,6 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     private LocalDateTime endOfDay(LocalDate d)   { return d.atTime(LocalTime.MAX); }
     private LocalDate todayOrDefault(LocalDate d)  { return d != null ? d : LocalDate.now(); }
 
-    // FIX: Tính % trend so với kỳ trước
     private String calcTrend(BigDecimal current, BigDecimal previous) {
         if (previous == null || previous.compareTo(BigDecimal.ZERO) == 0) return "";
         double pct = current.subtract(previous)
@@ -204,7 +202,6 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         LocalDateTime end   = endOfDay(endDate);
         int topN = (limit != null && limit > 0) ? limit : Integer.MAX_VALUE;
 
-        // FIX: truyền thêm storeId
         List<Object[]> rows = orderRepository.findRevenueGroupedByStore(start, end, storeId, topN);
 
         return rows.stream().map(r -> {

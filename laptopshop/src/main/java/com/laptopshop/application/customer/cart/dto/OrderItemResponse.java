@@ -17,8 +17,8 @@ public class OrderItemResponse {
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
     private boolean    reviewed;
-    private boolean    hasWarranty;  // ← thêm
-    private boolean    hasRefunded;  // ← thêm
+    private boolean    hasWarranty;
+    private boolean    hasRefunded;
 
     public static OrderItemResponse from(OrderItem item) {
         return from(item, false, false, false);
@@ -28,7 +28,6 @@ public class OrderItemResponse {
         return from(item, reviewed, false, false);
     }
 
-    // ← method mới dùng trong getOrderDetail
     public static OrderItemResponse from(OrderItem item, boolean reviewed,
                                          boolean hasWarranty, boolean hasRefunded) {
         OrderItemResponse dto = new OrderItemResponse();
@@ -50,8 +49,8 @@ public class OrderItemResponse {
         dto.unitPrice    = item.getUnitPrice();
         dto.totalPrice   = item.getTotalPrice();
         dto.reviewed     = reviewed;
-        dto.hasWarranty  = hasWarranty;  // ← thêm
-        dto.hasRefunded  = hasRefunded;  // ← thêm
+        dto.hasWarranty  = hasWarranty;
+        dto.hasRefunded  = hasRefunded;
         return dto;
     }
 }

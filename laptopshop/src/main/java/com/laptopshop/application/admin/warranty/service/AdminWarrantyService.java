@@ -54,12 +54,8 @@ public class AdminWarrantyService {
 
         WarrantyRequest warranty = findOrThrow(warrantyId);
 
-        // [PATCH] Dùng loadStaffByEmail thay vì findByEmail để load đủ role + store
-        // rồi kiểm tra chi nhánh ngay, không cần gọi thêm DB lần thứ 2
         Staff staff = storeAccessGuard.loadStaffByEmail(staffEmail);
 
-        // [PATCH] Kiểm tra staff chỉ được xử lý warranty thuộc chi nhánh mình.
-        // Warranty gắn với order → order gắn với store.
         if (warranty.getOrder() != null && warranty.getOrder().getStore() != null) {
             storeAccessGuard.assertCanAccessStore(
                     staffEmail, warranty.getOrder().getStore().getId());
@@ -112,7 +108,7 @@ public class AdminWarrantyService {
                 );
             }
         } catch (Exception e) {
-            // Không để lỗi notification fail transaction chính
+
         }
 
         return AdminWarrantyResponse.from(

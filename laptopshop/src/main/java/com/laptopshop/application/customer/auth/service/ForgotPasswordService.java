@@ -25,13 +25,12 @@ public class ForgotPasswordService {
 
     private static final int    OTP_LENGTH      = 6;
     private static final int    OTP_EXPIRE_MINS = 10;
-    private static final int    MAX_OTP_ATTEMPTS = 5; // rate-limit đơn giản
+    private static final int    MAX_OTP_ATTEMPTS = 5;
 
     // ── Step 1: Gửi OTP ──────────────────────────────────────────────────────
 
     @Transactional
     public void sendOtp(String email) {
-        // Luôn trả success dù email có tồn tại hay không (tránh email enumeration)
         boolean exists = userRepository.existsByEmail(email);
         if (!exists) return; // im lặng
 
@@ -69,12 +68,8 @@ public class ForgotPasswordService {
         record.setUsedAt(LocalDateTime.now());
         otpRepository.save(record);
 
-        // Trả về resetToken = bcrypt(email + otpId + timestamp)
-        // FE gửi lại token này ở step 3 để xác thực
         String raw = email + "|" + record.getId() + "|" + System.currentTimeMillis();
-        return passwordEncoder.encode(raw); // dùng làm opaque token tạm
-        // Lưu ý: đây là token đơn giản cho đồ án.
-        // Production nên dùng JWT signed ngắn hạn (5 phút).
+        return passwordEncoder.encode(raw);
     }
 
     // ── Step 3: Reset password ────────────────────────────────────────────────

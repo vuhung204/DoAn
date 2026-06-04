@@ -21,13 +21,13 @@ public class OrderDetailDto {
     private String            branchName;
     private String            paymentMethod;
     private String            payStatus;
-    private String            status;           // frontend string
+    private String            status;
     private BigDecimal        subtotal;
     private BigDecimal        discountAmount;
     private BigDecimal        shippingFee;
     private BigDecimal        totalAmount;
     private String            note;
-    private String            orderedAt;        // String thay vì LocalDateTime
+    private String            orderedAt;
     private List<OrderItemDto>     items;
     private List<OrderHistoryDto>  history;
 }

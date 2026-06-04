@@ -9,9 +9,8 @@ import lombok.Getter;
  */
 @Getter
 public class UpdateOrderStatusRequestDto {
-    /** Frontend string: "confirmed","processing","shipping","done","cancelled" */
     @NotBlank(message = "status không được để trống")
-    private String status;     // ← đổi từ newStatus → status
+    private String status;
 
     private String staffNote;
 

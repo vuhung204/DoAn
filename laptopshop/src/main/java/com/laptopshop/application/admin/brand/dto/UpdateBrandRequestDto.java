@@ -18,7 +18,6 @@ public class UpdateBrandRequestDto {
     @Size(max = 255)
     private String name;
 
-    /** null = giữ nguyên slug hiện tại */
     @Size(max = 255)
     private String slug;
 

@@ -19,7 +19,6 @@ public class CustomerDetailDto {
     private String name;
     private String email;
     private String phone;
-    /** Địa chỉ mặc định (text đầy đủ) — null nếu chưa có */
     private String primaryAddress;
     /** "active" | "locked" | "unverified" */
     private String status;
@@ -28,7 +27,7 @@ public class CustomerDetailDto {
     private Integer totalOrders;
     /** Tổng chi tiêu VND */
     private BigDecimal totalSpent;
-    /** totalSpent / totalOrders — null nếu chưa có đơn */
+    /** totalSpent / totalOrders */
     private BigDecimal avgPerOrder;
     private LocalDate joined;
     private List<AddressDto> addresses;

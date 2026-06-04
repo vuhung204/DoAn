@@ -41,16 +41,9 @@ public class AdminAuthService {
         }
 
         // 4. Build roles string cho JWT
-        //    JwtAuthFilter expect: "ROLE_SUPER_ADMIN" hoặc "ROLE_STORE_MANAGER" ...
-        //    Role.name trong DB lưu dạng SUPER_ADMIN → thêm prefix ROLE_
         String roleName = staff.getRole().getName();
-        // Uppercase để khớp hasAnyRole("SUPER_ADMIN") trong SecurityConfig
-        // DB lưu lowercase "super_admin" → JWT cần "ROLE_SUPER_ADMIN"
         String roleUpper = roleName.toUpperCase();
         String roles = roleUpper.startsWith("ROLE_") ? roleUpper : "ROLE_" + roleUpper;
-
-        // Thêm permissions từ role nếu có (JSON array trong Role.permissions)
-        // Ví dụ permissions = ["orders","inventory"] → thêm vào authorities
         String permissions = buildPermissions(staff);
         if (!permissions.isEmpty()) {
             roles = roles + "," + permissions;
@@ -81,8 +74,6 @@ public class AdminAuthService {
     private String buildPermissions(Staff staff) {
         String perms = staff.getRole().getPermissions();
         if (perms == null || perms.isBlank()) return "";
-
-        // Đơn giản: bỏ dấu [], " và split
         return perms
                 .replaceAll("[\\[\\]\"\\s]", "")
                 .trim();

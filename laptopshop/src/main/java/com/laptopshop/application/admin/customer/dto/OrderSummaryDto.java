@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class OrderSummaryDto {
     private String orderCode;
     private BigDecimal totalAmount;
-    /** PaymentMethod enum name, ví dụ: "COD", "VNPAY", "MOMO" — null nếu chưa có payment */
+    /** PaymentMethod enum name — null nếu chưa có payment */
     private String paymentMethod;
     private String status;
     private LocalDateTime orderedAt;
