@@ -23,7 +23,10 @@ public class UploadController {
     @Value("${upload.dir:uploads/}")
     private String uploadDir;
 
-    @Value("${server.host:http://127.0.0.1:9765}")
+//    @Value("${server.host:http://127.0.0.1:9765}")
+//    private String serverHost;
+
+    @Value("${server.host}")
     private String serverHost;
 
     @PostMapping("/image")
