@@ -18,11 +18,16 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
 
+        // Local development
         config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedOrigin("http://localhost:5174");
         config.addAllowedOrigin("http://127.0.0.1:5173");
         config.addAllowedOrigin("http://127.0.0.1:5174");
         config.addAllowedOrigin("http://localhost:3000");
+
+        // Production - Vercel
+        config.addAllowedOrigin("https://do-27i3rwq8f-hung-vu-s-projects.vercel.app");
+        config.addAllowedOriginPattern("https://*.vercel.app"); // cho phép tất cả preview deployments
 
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
