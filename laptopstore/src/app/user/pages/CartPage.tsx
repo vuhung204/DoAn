@@ -81,12 +81,9 @@ export default function CartPage() {
     const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     if (!token) { navigate('/login'); return; }
     try {
-      const res = await fetch(`(import.meta as any).env?.VITE_API_URL || 'http://localhost:9765'`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.status === 401) { navigate('/login'); return; }
-      if (!res.ok) throw new Error('Không thể tải giỏ hàng');
-      const data: CartResponse = await res.json();
+      // ✅ Dùng axios instance — baseURL + auth header đã cấu hình sẵn
+      const res = await api.get<CartResponse>(ENDPOINTS.CART.BASE);
+      const data = res.data;
       setCart(data);
 
       // Nếu giỏ thay đổi, re-validate mã đang áp để cập nhật discountAmount
@@ -94,7 +91,8 @@ export default function CartPage() {
         await revalidatePromotion(appliedPromotion.code, data);
       }
     } catch (err: any) {
-      setError(err.message);
+      if (err.response?.status === 401) { navigate('/login'); return; }
+      setError(err.response?.data?.message || err.message || 'Không thể tải giỏ hàng');
     } finally {
       setLoading(false);
     }
@@ -109,44 +107,39 @@ export default function CartPage() {
 
   const updateQuantity = async (productId: number, newQuantity: number) => {
     if (newQuantity < 1) return;
-    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-    if (!token) return;
     setUpdatingId(productId);
     try {
-      const baseUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:9765/api';
-      const res = await fetch(`${baseUrl}/cart/${productId}?quantity=${newQuantity}`, {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data: CartResponse = await res.json();
-        setCart(data);
-        window.dispatchEvent(new Event('cart-updated'));
+      // ✅ Dùng axios instance
+      const res = await api.put<CartResponse>(
+        ENDPOINTS.CART.ITEM(productId),
+        null,
+        { params: { quantity: newQuantity } },
+      );
+      const data = res.data;
+      setCart(data);
+      window.dispatchEvent(new Event('cart-updated'));
 
-        // Re-validate mã để cập nhật discount theo subtotal mới
-        if (appliedPromotion) {
-          await revalidatePromotion(appliedPromotion.code, data);
-        }
+      // Re-validate mã để cập nhật discount theo subtotal mới
+      if (appliedPromotion) {
+        await revalidatePromotion(appliedPromotion.code, data);
       }
+    } catch (err: any) {
+      // Lỗi cập nhật số lượng — có thể log hoặc hiện toast
+      console.error('Lỗi cập nhật số lượng:', err.response?.data || err.message);
     } finally {
       setUpdatingId(null);
     }
   };
 
   const removeItem = async (productId: number) => {
-    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-    if (!token) return;
     setUpdatingId(productId);
     try {
-      const baseUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:9765/api';
-      const res = await fetch(`${baseUrl}/cart/${productId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        await fetchCart();
-        window.dispatchEvent(new Event('cart-updated'));
-      }
+      // ✅ Dùng axios instance
+      await api.delete(ENDPOINTS.CART.ITEM(productId));
+      await fetchCart();
+      window.dispatchEvent(new Event('cart-updated'));
+    } catch (err: any) {
+      console.error('Lỗi xoá sản phẩm:', err.response?.data || err.message);
     } finally {
       setUpdatingId(null);
     }
