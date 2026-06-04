@@ -12,6 +12,23 @@ api.interceptors.request.use(config => {
   return config;
 });
 
+// ── Image URL helpers ─────────────────────────────────────────────────────
+
+function getImageHost(): string {
+  const apiUrl = (import.meta as any).env?.VITE_API_URL as string || 'http://127.0.0.1:9765/api';
+  return apiUrl.replace(/\/api\/?$/, '');
+}
+
+export function normalizeImageUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  try {
+    const path = new URL(url).pathname;
+    return getImageHost() + path;
+  } catch {
+    return url;
+  }
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────
 
 export interface ProductListDto {
@@ -128,20 +145,14 @@ export interface UpdateProductRequest {
 
 // ── API functions ─────────────────────────────────────────────────────────
 
-/** POST /api/admin/upload/image — trả về URL lưu trên server */
+/** POST /api/admin/upload/image */
 export async function uploadImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append('file', file);
-  const token = localStorage.getItem('access_token');
-  const baseURL = (import.meta as any).env?.VITE_API_URL || 'http://127.0.0.1:9765/api';
-  const res = await fetch(`${baseURL}/admin/upload/image`, {
-    method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: formData,
+  const { data } = await api.post<{ url: string }>('/admin/upload/image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
   });
-  if (!res.ok) throw new Error('Upload ảnh thất bại');
-  const data = await res.json();
-  return data.url as string;
+  return normalizeImageUrl(data.url);
 }
 
 /** GET /api/admin/products/filters/meta */

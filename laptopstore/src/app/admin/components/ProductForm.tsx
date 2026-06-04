@@ -3,6 +3,7 @@ import { ArrowLeft, Save, CloudUpload, X, Tag, Loader2 } from 'lucide-react';
 import {
   fetchProduct, createProduct, updateProduct, uploadImage,
   type ProductFiltersMetaDto, type ProductSpecsDto,
+  normalizeImageUrl,
 } from '../api/productApi';
 
 interface ProductFormProps {
@@ -68,7 +69,7 @@ export function ProductForm({ productId, meta, onSaved, onCancel }: ProductFormP
         battery:     p.specs?.batteryWh != null ? String(p.specs.batteryWh) : '',
         visible:     p.visible !== false,
       });
-      setImages(p.images?.map(i => i.imageUrl) ?? []);
+      setImages(p.images?.map(i => normalizeImageUrl(i.imageUrl)) ?? []);
     }).catch(console.error).finally(() => setLoading(false));
   }, [productId]);
 
