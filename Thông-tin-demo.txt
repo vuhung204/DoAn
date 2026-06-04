@@ -1,0 +1,22 @@
+Link demo: https://do-4wdj1acpn-hung-vu-s-projects.vercel.app/
+Link demo trang quản trị: https://do-4wdj1acpn-hung-vu-s-projects.vercel.app/admin/login
+Tài khoản test admin: 
+Role: Admin
+Tài khoản: adminlaptopshop24@gmail.com
+Mật khẩu: Test@123
+
+Role: Quản lý chi nhánh
+Tài khoản: manager@test.com
+Mật khẩu: Test@123
+
+Role: Nhân viên
+Tài khoản: staff@test.com
+Mật khẩu: Test@123
+
+Tài khoản test thanh toán VNPay
+Thông tin	Giá trị
+Ngân hàng	NCB
+Số thẻ	9704198526191432198
+Tên chủ thẻ	NGUYEN VAN A
+Ngày phát hành	07/15
+OTP	123456
