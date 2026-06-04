@@ -40,7 +40,7 @@ import api from '../config/apiConfig';
 import { useAddToCart } from '../hook/useAddToCart';
 
 const API_URL =
-  (import.meta as any).env?.VITE_API_URL || 'http://localhost:9765';
+  (import.meta as any).env?.VITE_API_URL || 'http://127.0.0.1:9765/api';
 
 interface ProductDetailResponse {
   id: number;
@@ -133,14 +133,14 @@ export default function ProductDetailPage() {
       sessionStorage.getItem('authToken');
 
     Promise.all([
-      fetch(`${API_URL}/api/products/${id}`).then((r) => {
+      fetch(`${API_URL}/products/${id}`).then((r) => {
         if (!r.ok) throw new Error('Không tìm thấy sản phẩm');
         return r.json();
       }),
-      fetch(`${API_URL}/api/products/${id}/reviews?page=0&size=10`)
+      fetch(`${API_URL}/products/${id}/reviews?page=0&size=10`)
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
-      fetch(`${API_URL}/api/products?size=10&sort=newest`)
+      fetch(`${API_URL}/products?size=10&sort=newest`)
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
       token

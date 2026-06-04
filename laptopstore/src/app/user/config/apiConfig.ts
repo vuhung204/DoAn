@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:9765';
+export const BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://127.0.0.1:9765/api';
 
 export const ENDPOINTS = {
   AUTH: {
@@ -69,6 +69,7 @@ export const ENDPOINTS = {
 
 const api = axios.create({
   baseURL: BASE_URL,
+  timeout: 15_000,
   headers: { 'Content-Type': 'application/json' },
 });
 

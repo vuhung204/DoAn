@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { notifyCartUpdated } from '../context/AuthContext';
 
 const API_URL =
-  (import.meta as any).env?.VITE_API_URL || 'http://localhost:9765';
+  (import.meta as any).env?.VITE_API_URL || 'http://127.0.0.1:9765/api';
 
 export function useAddToCart() {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export function useAddToCart() {
 
     setLoadingId(productId);
     try {
-      const res = await fetch(`${API_URL}/api/cart`, {
+      const res = await fetch(`${API_URL}/cart`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
