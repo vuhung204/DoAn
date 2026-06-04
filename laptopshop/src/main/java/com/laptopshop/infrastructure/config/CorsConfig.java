@@ -3,10 +3,8 @@ package com.laptopshop.infrastructure.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * CORS Configuration - cho phép React frontend (port 5173) gọi API từ Spring Boot backend (port 9765)
@@ -15,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsConfig {
 
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
         // Local development
@@ -26,8 +24,7 @@ public class CorsConfig {
         config.addAllowedOrigin("http://localhost:3000");
 
         // Production - Vercel
-        config.addAllowedOrigin("https://do-27i3rwq8f-hung-vu-s-projects.vercel.app");
-        config.addAllowedOriginPattern("https://*.vercel.app"); // cho phép tất cả preview deployments
+        config.addAllowedOriginPattern("https://*.vercel.app");
 
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
@@ -37,6 +34,6 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
-        return new CorsFilter(source);
+        return source;
     }
 }
