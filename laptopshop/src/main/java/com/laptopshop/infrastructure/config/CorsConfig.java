@@ -16,15 +16,11 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Local development
-        config.addAllowedOrigin("http://localhost:5173");
-        config.addAllowedOrigin("http://localhost:5174");
-        config.addAllowedOrigin("http://127.0.0.1:5173");
-        config.addAllowedOrigin("http://127.0.0.1:5174");
-        config.addAllowedOrigin("http://localhost:3000");
-
-        // Production - Vercel
+        // Dùng Pattern thay vì Origin để tránh conflict
+        config.addAllowedOriginPattern("http://localhost:*");
+        config.addAllowedOriginPattern("http://127.0.0.1:*");
         config.addAllowedOriginPattern("https://*.vercel.app");
+        config.addAllowedOriginPattern("https://vercel.app");
 
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
