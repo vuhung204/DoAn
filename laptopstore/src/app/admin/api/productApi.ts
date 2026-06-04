@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:9765/api',
+  baseURL: (import.meta as any).env?.VITE_API_URL || 'http://127.0.0.1:9765/api',
   timeout: 15_000,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -133,7 +133,8 @@ export async function uploadImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append('file', file);
   const token = localStorage.getItem('access_token');
-  const res = await fetch('http://127.0.0.1:9765/api/admin/upload/image', {
+  const baseURL = (import.meta as any).env?.VITE_API_URL || 'http://127.0.0.1:9765/api';
+  const res = await fetch(`${baseURL}/admin/upload/image`, {
     method: 'POST',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: formData,

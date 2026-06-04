@@ -1,7 +1,5 @@
 import api from './api';
 
-// ─── Types khớp với BE DTOs ───────────────────────────────────────────────────
-
 export interface FeaturedProduct {
   id: number;
   name: string;
