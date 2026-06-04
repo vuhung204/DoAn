@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BASE_URL = 'http://localhost:9765/api';
+export const BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:9765';
 
 export const ENDPOINTS = {
   AUTH: {

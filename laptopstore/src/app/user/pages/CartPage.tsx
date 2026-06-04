@@ -81,7 +81,7 @@ export default function CartPage() {
     const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     if (!token) { navigate('/login'); return; }
     try {
-      const res = await fetch(`http://localhost:9765/api/cart`, {
+      const res = await fetch(`(import.meta as any).env?.VITE_API_URL || 'http://localhost:9765'`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.status === 401) { navigate('/login'); return; }
@@ -113,7 +113,8 @@ export default function CartPage() {
     if (!token) return;
     setUpdatingId(productId);
     try {
-      const res = await fetch(`http://localhost:9765/api/cart/${productId}?quantity=${newQuantity}`, {
+      const baseUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:9765/api';
+      const res = await fetch(`${baseUrl}/cart/${productId}?quantity=${newQuantity}`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -137,7 +138,8 @@ export default function CartPage() {
     if (!token) return;
     setUpdatingId(productId);
     try {
-      const res = await fetch(`http://localhost:9765/api/cart/${productId}`, {
+      const baseUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:9765/api';
+      const res = await fetch(`${baseUrl}/cart/${productId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

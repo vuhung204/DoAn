@@ -9,7 +9,7 @@ import {
 
 type Step = 'email' | 'otp' | 'password' | 'done';
 
-const API = 'http://localhost:9765/api/auth';
+const API = `${(import.meta as any).env?.VITE_API_URL || 'http://localhost:9765/api'}/auth`;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
