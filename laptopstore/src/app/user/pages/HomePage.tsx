@@ -484,7 +484,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ───── CATEGORIES ───── */}
+      {/* ───── CATEGORIES ─────
       <section className="py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <SectionHeader
@@ -522,7 +522,7 @@ export default function HomePage() {
             </div>
           )}
         </div>
-      </section>
+      </section> */}
 
       {/* ───── 🔥 BÁN CHẠY NHẤT ───── */}
       <section className="py-16 md:py-20 bg-gradient-to-b from-orange-50 to-white">
