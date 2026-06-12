@@ -1,18 +1,25 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { BranchMeta, PivotRow } from '../api/revenueApi';
 
 interface RevenueMultiLineChartProps {
   mode: 'day' | 'month' | 'year';
-  data: PivotRow[];       // đã pivot sẵn từ hook
-  branches: BranchMeta[]; // derive từ BE comparison
+  data: PivotRow[];        // đã pivot sẵn từ hook
+  branches: BranchMeta[];  // derive từ BE comparison
 }
 
 const RevenueMultiLineChart = ({ mode, data, branches }: RevenueMultiLineChartProps) => {
-  const [activeBranches, setActiveBranches] = useState<string[]>(() => branches.map(b => b.id));
+  const [activeBranches, setActiveBranches] = useState<string[]>(() =>
+    branches.map(b => b.id)
+  );
 
-  // Sync active list khi branches thay đổi (mode switch)
-  const effectiveBranches = branches.length > 0 ? branches : [];
+  // FIX: sync lại activeBranches mỗi khi branches thay đổi (đổi mode day/month/year)
+  // Nếu không có useEffect này, khi đổi mode branches mới sẽ có id khác
+  // nhưng activeBranches vẫn giữ id cũ → activeSet.has() luôn false → không line nào hiện
+  useEffect(() => {
+    setActiveBranches(branches.map(b => b.id));
+  }, [branches]);
+
   const activeSet = new Set(activeBranches);
 
   const toggleBranch = (id: string) => {
@@ -31,10 +38,11 @@ const RevenueMultiLineChart = ({ mode, data, branches }: RevenueMultiLineChartPr
   // BE trả VND tuyệt đối — chia theo unit để hiển thị
   const divisor = mode === 'day' ? 1_000_000 : 1_000_000_000;
 
+  // FIX: key trong chartData dùng String(storeId) — khớp với branch.id từ extractBranches()
   const chartData = data.map(row => {
     const mapped: Record<string, string | number> = { label: row.label };
-    for (const b of effectiveBranches) {
-      const raw = row[b.id];
+    for (const b of branches) {
+      const raw = row[b.id]; // b.id = String(storeId) — khớp với pivotSeries()
       mapped[b.id] = raw != null ? Number(raw) / divisor : 0;
     }
     return mapped;
@@ -45,7 +53,7 @@ const RevenueMultiLineChart = ({ mode, data, branches }: RevenueMultiLineChartPr
       <div className="flex items-center justify-between mb-4.5 gap-3 flex-wrap">
         <h3 className="text-[15px] font-extrabold text-gray-900">{title}</h3>
         <div className="flex gap-2.5 flex-wrap">
-          {effectiveBranches.map(branch => {
+          {branches.map(branch => {
             const isActive = activeSet.has(branch.id);
             return (
               <label
@@ -88,12 +96,18 @@ const RevenueMultiLineChart = ({ mode, data, branches }: RevenueMultiLineChartPr
                 );
               }}
             />
-            {effectiveBranches.map(branch =>
+            {branches.map(branch =>
               activeSet.has(branch.id) ? (
-                <Line key={branch.id} type="monotone" dataKey={branch.id} name={branch.name}
-                  stroke={branch.color} strokeWidth={2.2}
+                <Line
+                  key={branch.id}
+                  type="monotone"
+                  dataKey={branch.id}
+                  name={branch.name}
+                  stroke={branch.color}
+                  strokeWidth={2.2}
                   dot={{ fill: '#fff', stroke: branch.color, strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6 }} />
+                  activeDot={{ r: 6 }}
+                />
               ) : null
             )}
           </LineChart>
@@ -101,8 +115,10 @@ const RevenueMultiLineChart = ({ mode, data, branches }: RevenueMultiLineChartPr
       </div>
 
       <div className="flex justify-center gap-5 mt-3.5 flex-wrap">
-        {effectiveBranches.map(branch => (
-          <div key={branch.id} onClick={() => toggleBranch(branch.id)}
+        {branches.map(branch => (
+          <div
+            key={branch.id}
+            onClick={() => toggleBranch(branch.id)}
             className={`flex items-center gap-1.5 text-[12.5px] text-gray-600 cursor-pointer transition-opacity ${activeSet.has(branch.id) ? 'opacity-100' : 'opacity-35'}`}
           >
             <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: branch.color }} />

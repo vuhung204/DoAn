@@ -35,6 +35,7 @@ interface DashboardResponse {
 
 interface OrderItemFull    { productId: number; productName: string; brandName: string | null; image: string | null; quantity: number; unitPrice: number; totalPrice: number; }
 interface OrderFull        { id: number; orderCode: string; status: string; subtotal: number; discountAmount: number; shippingFee: number; totalAmount: number; note: string | null; orderedAt: string; items: OrderItemFull[]; }
+// district vẫn giữ trong type để tương thích BE, nhưng FE không hiển thị field này
 interface AddressRequest   { recipientName: string; phone: string; addressLine: string; ward?: string; district: string; city: string; isDefault: boolean; }
 interface UpdateProfile    { fullName: string; phone: string; avatarUrl: string; }
 
@@ -42,6 +43,7 @@ interface UpdateProfile    { fullName: string; phone: string; avatarUrl: string;
 
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1704726135027-9c6f034cfa41?w=200&q=80';
 
+// district giữ "" để BE không lỗi validation
 const EMPTY_ADDRESS: AddressRequest = { recipientName: '', phone: '', addressLine: '', ward: '', district: '', city: '', isDefault: false };
 
 /** Các trạng thái mà user được phép hủy đơn */
@@ -52,6 +54,10 @@ const CANCELLABLE_STATUSES = new Set(['pending', 'confirmed']);
 const fmt   = (n: number) => `${n.toLocaleString('vi-VN')}₫`;
 const fmtDt = (s: string) => new Date(s).toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 const fmtD  = (s: string) => new Date(s).toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+/** Ghép địa chỉ hiển thị — bỏ district, chỉ giữ addressLine, ward, city */
+const formatAddress = (a: Pick<AddressItem, 'addressLine' | 'ward' | 'city'>) =>
+  [a.addressLine, a.ward, a.city].filter(Boolean).join(', ');
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   pending:    { label: 'Chờ xác nhận', color: 'border-amber-200 bg-amber-50 text-amber-700',   icon: <Clock className="size-4 text-amber-600" /> },
@@ -139,8 +145,8 @@ export default function ProfilePage() {
   const [ordersError,   setOrdersError]   = useState('');
 
   // ── Cancel order state ──────────────────────────────────────────────────────
-  const [cancellingId,    setCancellingId]    = useState<number | null>(null); // order đang gửi request
-  const [confirmCancelId, setConfirmCancelId] = useState<number | null>(null); // order đang chờ confirm dialog
+  const [cancellingId,    setCancellingId]    = useState<number | null>(null);
+  const [confirmCancelId, setConfirmCancelId] = useState<number | null>(null);
   const [cancelError,     setCancelError]     = useState('');
 
   // ── Mutate states ───────────────────────────────────────────────────────────
@@ -203,7 +209,6 @@ export default function ProfilePage() {
     setCancelError('');
     try {
       await api.put(`${ENDPOINTS.ORDERS.BASE}/${orderId}/cancel`);
-      // Cập nhật status trong local state — không cần reload lại toàn bộ list
       setOrders((prev) =>
         prev.map((o) => o.id === orderId ? { ...o, status: 'cancelled' } : o)
       );
@@ -253,17 +258,27 @@ export default function ProfilePage() {
   const openNewAddr  = () => { setEditingAddrId(null); setAddrForm(EMPTY_ADDRESS); setShowAddrForm(true); setAddrMsg(''); };
   const openEditAddr = (a: AddressItem) => {
     setEditingAddrId(a.id);
-    setAddrForm({ recipientName: a.recipientName, phone: a.phone, addressLine: a.addressLine, ward: a.ward ?? '', district: a.district, city: a.city, isDefault: a.isDefault });
+    setAddrForm({
+      recipientName: a.recipientName,
+      phone: a.phone,
+      addressLine: a.addressLine,
+      ward: a.ward ?? '',
+      district: a.district, // giữ lại giá trị cũ từ BE, không hiển thị trên form
+      city: a.city,
+      isDefault: a.isDefault,
+    });
     setShowAddrForm(true); setAddrMsg('');
   };
 
   const handleSaveAddr = async () => {
     setAddrMsg('');
-    if (!addrForm.recipientName || !addrForm.phone || !addrForm.addressLine || !addrForm.district || !addrForm.city) {
+    // Validation: bỏ district khỏi required check
+    if (!addrForm.recipientName || !addrForm.phone || !addrForm.addressLine || !addrForm.city) {
       setAddrMsg('Vui lòng nhập đầy đủ thông tin.'); return;
     }
     setSavingAddr(true);
     try {
+      // Vẫn gửi district lên BE (giá trị "" hoặc giá trị cũ) để không lỗi
       const payload = { ...addrForm, ward: addrForm.ward || undefined };
       if (editingAddrId) await api.put(`${ENDPOINTS.USER.ADDRESSES}/${editingAddrId}`, payload);
       else               await api.post(ENDPOINTS.USER.ADDRESSES, payload);
@@ -362,7 +377,7 @@ export default function ProfilePage() {
         )}
 
         <div className="grid gap-8 lg:grid-cols-12">
-          {/* ───────────────── SIDEBAR NEW UI ───────────────── */}
+          {/* ───────────────── SIDEBAR ───────────────── */}
           <div className="lg:col-span-3">
             <div className="sticky top-24 overflow-hidden rounded-3xl border border-white/20 bg-white shadow-xl">
 
@@ -456,7 +471,7 @@ export default function ProfilePage() {
           {/* ── Content ──────────────────────────────────────────────────────── */}
           <div className="lg:col-span-9">
 
-            {/* ───────────────── OVERVIEW NEW UI ───────────────── */}
+            {/* ───────────────── OVERVIEW ───────────────── */}
             {activeTab === 'overview' && (
               <div className="space-y-8">
                 {/* Welcome */}
@@ -578,9 +593,7 @@ export default function ProfilePage() {
                   <div className="md:col-span-2">
                     <Label>Địa chỉ mặc định</Label>
                     <div className="mt-2 rounded-lg border bg-gray-50 p-3 text-sm text-gray-600">
-                      {defaultAddress
-                        ? [defaultAddress.addressLine, defaultAddress.ward, defaultAddress.district, defaultAddress.city].filter(Boolean).join(', ')
-                        : 'Chưa có địa chỉ mặc định'}
+                      {defaultAddress ? formatAddress(defaultAddress) : 'Chưa có địa chỉ mặc định'}
                     </div>
                   </div>
                 </div>
@@ -592,7 +605,6 @@ export default function ProfilePage() {
               <div className="rounded-lg border bg-white p-6">
                 <h2 className="mb-6 text-2xl font-bold">Đơn hàng của tôi</h2>
 
-                {/* Cancel error banner */}
                 {cancelError && (
                   <div className="mb-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                     <AlertCircle className="size-4 flex-shrink-0" />
@@ -640,14 +652,11 @@ export default function ProfilePage() {
 
                         <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4">
                           <div className="flex items-center gap-2">
-                            {/* Xem chi tiết */}
                             <Button variant="outline" size="sm" asChild>
                               <Link to={`/order-success?orderId=${order.id}`}>
                                 <Eye className="mr-2 size-4" />Chi tiết
                               </Link>
                             </Button>
-
-                            {/* Hủy đơn — chỉ hiện khi còn khả năng hủy */}
                             {isCancellable && (
                               <Button
                                 variant="outline"
@@ -662,7 +671,6 @@ export default function ProfilePage() {
                               </Button>
                             )}
                           </div>
-
                           <span className="text-xl font-bold">{fmt(order.totalAmount)}</span>
                         </div>
                       </div>
@@ -719,10 +727,12 @@ export default function ProfilePage() {
                   <Button onClick={openNewAddr}><Plus className="mr-2 size-4" />Thêm mới</Button>
                 </div>
                 {addrMsg && <div className="mb-4 rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700">{addrMsg}</div>}
+
                 {showAddrForm && (
                   <div className="mb-6 rounded-lg border border-red-100 bg-red-50 p-5">
                     <h3 className="mb-4 text-lg font-semibold">{editingAddrId ? 'Cập nhật địa chỉ' : 'Thêm địa chỉ mới'}</h3>
                     <div className="grid gap-4 md:grid-cols-2">
+                      {/* Người nhận & SĐT */}
                       {([['recipientName', 'Người nhận'], ['phone', 'Số điện thoại']] as [keyof AddressRequest, string][]).map(([field, label]) => (
                         <div key={field}>
                           <Label>{label}</Label>
@@ -730,18 +740,24 @@ export default function ProfilePage() {
                             onChange={(e) => setAddrForm((f) => ({ ...f, [field]: e.target.value }))} />
                         </div>
                       ))}
+
+                      {/* Địa chỉ chi tiết */}
                       <div className="md:col-span-2">
                         <Label>Địa chỉ chi tiết</Label>
                         <Input className="mt-2" value={addrForm.addressLine}
                           onChange={(e) => setAddrForm((f) => ({ ...f, addressLine: e.target.value }))} />
                       </div>
-                      {([['ward', 'Phường/Xã'], ['district', 'Quận/Huyện'], ['city', 'Tỉnh/Thành phố']] as [keyof AddressRequest, string][]).map(([field, label]) => (
+
+                      {/* Phường/Xã & Tỉnh/Thành phố — bỏ Quận/Huyện */}
+                      {([['ward', 'Phường/Xã'], ['city', 'Tỉnh/Thành phố']] as [keyof AddressRequest, string][]).map(([field, label]) => (
                         <div key={field}>
                           <Label>{label}</Label>
                           <Input className="mt-2" value={String(addrForm[field] ?? '')}
                             onChange={(e) => setAddrForm((f) => ({ ...f, [field]: e.target.value }))} />
                         </div>
                       ))}
+
+                      {/* Checkbox mặc định */}
                       <div className="flex items-center gap-2 pt-8">
                         <input type="checkbox" id="isDefault" checked={addrForm.isDefault} className="size-4 accent-red-600"
                           onChange={(e) => setAddrForm((f) => ({ ...f, isDefault: e.target.checked }))} />
@@ -756,6 +772,7 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 )}
+
                 <div className="grid gap-6 md:grid-cols-2">
                   {addresses.length === 0 && <div className="rounded-lg border border-dashed p-8 text-center text-gray-500 md:col-span-2">Chưa có địa chỉ nào.</div>}
                   {addresses.map((a) => (
@@ -764,8 +781,10 @@ export default function ProfilePage() {
                       <h3 className="mb-2 text-lg font-bold">{a.recipientName}</h3>
                       <div className="mb-4 space-y-2 text-sm text-gray-600">
                         <p className="flex items-center gap-2"><Phone className="size-4" />{a.phone}</p>
-                        <p className="flex items-start gap-2"><MapPin className="mt-0.5 size-4 flex-shrink-0" />
-                          <span>{[a.addressLine, a.ward, a.district, a.city].filter(Boolean).join(', ')}</span>
+                        <p className="flex items-start gap-2">
+                          <MapPin className="mt-0.5 size-4 flex-shrink-0" />
+                          {/* Hiển thị không có district */}
+                          <span>{formatAddress(a)}</span>
                         </p>
                       </div>
                       <div className="flex gap-2 border-t pt-4">

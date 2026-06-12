@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { Footer } from '../components/Footer';
+import ProductChatBot from '../components/ProductChatBot';
 
 import {
   fetchHomePageData,
@@ -72,7 +73,6 @@ interface SectionHeaderProps {
   title: string;
   subtitle?: string;
   linkTo?: string;
-  /** Màu nhấn của icon badge */
   accentClass?: string;
 }
 
@@ -132,7 +132,6 @@ interface ProductSectionProps {
   bgClass?: string;
   linkTo?: string;
   accentClass?: string;
-  /** Số cột trên màn lớn: 4 hoặc 5 */
   cols?: 4 | 5;
 }
 
@@ -178,7 +177,6 @@ function ProductSection({
 }
 
 // ───────────────── BEST SELLER BADGE ─────────────────
-/** Wrapper quanh ProductCard để thêm "rank badge" #1, #2, #3 */
 function BestSellerCard({
   rank,
   product,
@@ -212,7 +210,6 @@ function BestSellerCard({
 }
 
 // ───────────────── TOP RATED CARD ─────────────────
-/** Wrapper hiển thị số sao nổi bật */
 function TopRatedCard({
   product,
   originalRating,
@@ -220,7 +217,6 @@ function TopRatedCard({
   product: ReturnType<typeof toProductCardProps>;
   originalRating: number;
 }) {
-  const stars = Math.round(originalRating);
   return (
     <div className="relative">
       {originalRating > 0 && (
@@ -484,46 +480,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ───── CATEGORIES ─────
-      <section className="py-16 md:py-20">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <SectionHeader
-            title="Danh mục sản phẩm"
-            subtitle="Khám phá các dòng laptop phù hợp với nhu cầu của bạn"
-          />
-          {loading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-64 rounded-3xl bg-gray-200 animate-pulse" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {displayCategories.slice(0, 4).map((cat) => (
-                <Link
-                  key={cat.id}
-                  to={`/products?category=${cat.slug}`}
-                  className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
-                >
-                  <ImageWithFallback
-                    src={CATEGORY_IMAGES[cat.slug] ?? DEFAULT_CATEGORY_IMAGE}
-                    alt={cat.name}
-                    className="h-64 w-full object-cover transition-transform duration-700 group-hover:scale-125"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-2xl font-black text-white">{cat.name}</h3>
-                    {cat.productCount > 0 && (
-                      <p className="mt-2 text-sm text-white/80">{cat.productCount} sản phẩm</p>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section> */}
-
       {/* ───── 🔥 BÁN CHẠY NHẤT ───── */}
       <section className="py-16 md:py-20 bg-gradient-to-b from-orange-50 to-white">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
@@ -686,6 +642,9 @@ export default function HomePage() {
       )}
 
       <Footer />
+
+      {/* ───── AI CHATBOT ───── */}
+      <ProductChatBot />
     </div>
   );
 }

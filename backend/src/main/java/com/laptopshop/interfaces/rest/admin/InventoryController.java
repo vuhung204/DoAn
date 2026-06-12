@@ -197,6 +197,18 @@ public class InventoryController {
         return ResponseEntity.ok(adminInventoryService.listAlerts(severity, branchId));
     }
 
+    // ── POST /admin/inventory/alerts/sync ─────────────────────────────────────
+    // NEW: Quét toàn bộ store_inventory và đồng bộ lại bảng inventory_alerts.
+    // Gọi 1 lần để backfill alert cho data tồn kho hiện có (trước đây alert
+    // chỉ được tạo khi có giao dịch import/export/transfer/adjust đi qua).
+    // Có thể gọi định kỳ (cron/scheduled job) để giữ alert luôn đúng với tồn kho thực tế.
+    @PostMapping("/alerts/sync")
+    @PreAuthorize(ROLES_WRITE)
+    public ResponseEntity<Void> syncAlerts() {
+        adminInventoryService.syncAllAlerts();
+        return ResponseEntity.noContent().build();
+    }
+
     // ── GET /admin/inventory/export ───────────────────────────────────────────
     // Đặt SAU /alerts để tránh conflict với path variable
     @GetMapping("/export")

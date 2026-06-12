@@ -58,34 +58,37 @@ export interface RevenueSummaryDto {
   branchComparisonSnapshot: BranchComparisonDto[];
 }
 
-// ── Pivot helper: flat series rows → { label, [storeKey]: revenue } ───────
+// ── Pivot helper: flat series rows → { label, [storeId]: revenue } ────────
+// FIX: dùng storeId (number, luôn unique) thay vì storeKey (string có thể
+//      bị truncate trùng nhau bởi toStoreKey() ở BE)
 export interface PivotRow {
   label: string;
-  [storeKey: string]: string | number;
+  [key: string]: string | number;
 }
 
 export function pivotSeries(rows: RevenueSeriesPointDto[]): PivotRow[] {
   const map = new Map<string, PivotRow>();
   for (const row of rows) {
-    const key = row.storeKey ?? 'all';
+    const key = row.storeId != null ? String(row.storeId) : 'all';
     if (!map.has(row.label)) map.set(row.label, { label: row.label });
     map.get(row.label)![key] = Number(row.revenue);
   }
   return Array.from(map.values());
 }
 
-// ── Branches helper: derive unique branches từ series ─────────────────────
+// ── Branches helper: derive unique branches từ comparison ─────────────────
+// FIX: id dùng String(storeId) thay vì storeKey để đảm bảo match với pivot
 const PALETTE = ['#2563eb','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316'];
 
 export interface BranchMeta {
-  id: string;       // storeKey
-  name: string;     // storeName
+  id: string;    // String(storeId) — stable, unique
+  name: string;  // storeName
   color: string;
 }
 
 export function extractBranches(comparison: BranchComparisonDto[]): BranchMeta[] {
   return comparison.map((b, i) => ({
-    id:    b.storeKey,
+    id:    String(b.storeId),  // FIX: storeId thay vì storeKey
     name:  b.storeName,
     color: PALETTE[i % PALETTE.length],
   }));

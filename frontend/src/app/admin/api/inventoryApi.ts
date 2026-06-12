@@ -263,6 +263,11 @@ export async function fetchAlerts(params?: {
   return data;
 }
 
+/** POST /admin/inventory/alerts/sync — quét lại toàn bộ tồn kho và đồng bộ alert */
+export async function syncAlerts(): Promise<void> {
+  await api.post('/admin/inventory/alerts/sync');
+}
+
 /** GET /admin/inventory/export — tải file xlsx */
 export async function exportInventory(params: {
   exportType: 'PRODUCTS' | 'IMPORTS' | 'EXPORTS' | 'TRANSFERS' | 'ALERTS';

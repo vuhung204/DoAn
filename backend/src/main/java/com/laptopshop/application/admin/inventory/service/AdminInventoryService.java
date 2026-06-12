@@ -72,4 +72,6 @@ public interface AdminInventoryService {
 
     /** Xuất XLSX: type = PRODUCTS | IMPORTS | EXPORTS | TRANSFERS | ALERTS */
     byte[] exportInventory(ExportRequestDto req);
+
+    void syncAllAlerts();
 }

@@ -322,6 +322,26 @@ public class AdminInventoryServiceImpl implements AdminInventoryService {
                 )).collect(Collectors.toList());
     }
 
+    /**
+     * NEW: Quét toàn bộ store_inventory và đồng bộ lại bảng inventory_alerts.
+     * Cần gọi 1 lần để backfill cho data đã tồn tại sẵn (trước đây alert chỉ
+     * được ghi khi có giao dịch import/export/transfer/adjust đi qua),
+     * và có thể gọi định kỳ (scheduled) để giữ alert luôn đồng bộ với tồn kho thực tế.
+     */
+    @Override
+    @Transactional
+    public void syncAllAlerts() {
+        List<StoreInventory> all = storeInventoryRepo.findAllForExport(null);
+        for (StoreInventory si : all) {
+            updateAlert(
+                    si.getStore().getId(),
+                    si.getProduct().getId(),
+                    si.getQuantity(),
+                    si.getMinQuantity()
+            );
+        }
+    }
+
     // ── EXPORT XLSX ──────────────────────────────────────────────────────────
 
     @Override

@@ -12,6 +12,7 @@ import {
   createExport,
   createTransfer,
   exportInventory,
+  syncAlerts,
   type InventoryOverviewDto,
   type BranchInventoryDto,
   type ProductInventoryDto,
@@ -78,7 +79,7 @@ export function useInventory() {
     try {
       const data = await fetchOverview();
       setOverview(data);
-    } catch { /* fail silently — hiện lỗi cục bộ nếu cần */ }
+    } catch { /* fail silently */ }
     finally { setOvLoading(false); }
   }, []);
 
@@ -137,7 +138,20 @@ export function useInventory() {
   useEffect(() => { loadImports();  }, [loadImports]);
   useEffect(() => { loadExports();  }, [loadExports]);
   useEffect(() => { loadTransfers();}, [loadTransfers]);
-  useEffect(() => { loadAlerts();   }, [loadAlerts]);
+
+  // ── Auto sync alerts khi alertSeverity thay đổi (hoặc lần đầu mount) ──
+  useEffect(() => {
+    const run = async () => {
+      setAltLoading(true);
+      try {
+        await syncAlerts();
+        const data = await fetchAlerts({ severity: alertSeverity });
+        setAlerts(data);
+      } catch { /* fail silently */ }
+      finally { setAltLoading(false); }
+    };
+    run();
+  }, [alertSeverity]);
 
   // ── Actions ──────────────────────────────────────────────────────────────
 
@@ -201,6 +215,21 @@ export function useInventory() {
       showToast('❌ ' + msg);
     } finally { setActionLoading(false); }
   }, [loadProducts, loadAlerts, loadOverview]);
+
+  const handleSyncAlerts = useCallback(async () => {
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      await syncAlerts();
+      await loadAlerts();
+      await loadOverview();
+      showToast('✅ Đã đồng bộ cảnh báo tồn kho');
+    } catch (e) {
+      const msg = extractMsg(e);
+      setActionError(msg);
+      showToast('❌ ' + msg);
+    } finally { setActionLoading(false); }
+  }, [loadAlerts, loadOverview]);
 
   const handleExport = useCallback(async (
     type: 'PRODUCTS' | 'IMPORTS' | 'EXPORTS' | 'TRANSFERS' | 'ALERTS',
@@ -266,6 +295,7 @@ export function useInventory() {
     handleCreateTransfer,
     handleAdjustStock,
     handleExport,
+    handleSyncAlerts,
     actionLoading,
     actionError,
 
