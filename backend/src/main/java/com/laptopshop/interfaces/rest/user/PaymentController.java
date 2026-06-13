@@ -6,6 +6,7 @@ import com.laptopshop.application.customer.payment.service.PaymentService;
 import com.laptopshop.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,9 @@ import java.util.Map;
 public class PaymentController {
     private final PaymentService paymentService;
     private final UserRepository userRepository;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     private Long getUserId(Authentication auth) {
         return userRepository.findByEmail(auth.getName())
@@ -59,11 +63,11 @@ public class PaymentController {
 
             paymentService.handleVNPayCallback(params);
 
-            response.sendRedirect("http://localhost:5173/order-success?orderId=" + orderId);
+            response.sendRedirect(frontendUrl + "/order-success?orderId=" + orderId);
 
         } catch (Exception e) {
             System.out.println("=== VNPAY CALLBACK ERROR: " + e.getMessage() + " ===");
-            response.sendRedirect("http://localhost:5173/order-failed?orderId=" + orderId);
+            response.sendRedirect(frontendUrl + "/order-failed?orderId=" + orderId);
         }
     }
 
