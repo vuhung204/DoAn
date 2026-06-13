@@ -322,23 +322,16 @@ public class AdminInventoryServiceImpl implements AdminInventoryService {
                 )).collect(Collectors.toList());
     }
 
-    /**
-     * NEW: Quét toàn bộ store_inventory và đồng bộ lại bảng inventory_alerts.
-     * Cần gọi 1 lần để backfill cho data đã tồn tại sẵn (trước đây alert chỉ
-     * được ghi khi có giao dịch import/export/transfer/adjust đi qua),
-     * và có thể gọi định kỳ (scheduled) để giữ alert luôn đồng bộ với tồn kho thực tế.
-     */
     @Override
     @Transactional
     public void syncAllAlerts() {
-        List<StoreInventory> all = storeInventoryRepo.findAllForExport(null);
-        for (StoreInventory si : all) {
-            updateAlert(
-                    si.getStore().getId(),
-                    si.getProduct().getId(),
-                    si.getQuantity(),
-                    si.getMinQuantity()
-            );
+        List<Object[]> pairs = storeInventoryRepo.findAllStoreProductPairs();
+        for (Object[] row : pairs) {
+            Long   storeId   = ((Number) row[0]).longValue();
+            Long   productId = ((Number) row[1]).longValue();
+            int    stock     = ((Number) row[2]).intValue();
+            int    minStock  = ((Number) row[3]).intValue();
+            updateAlert(storeId, productId, stock, minStock);
         }
     }
 
@@ -515,7 +508,7 @@ public class AdminInventoryServiceImpl implements AdminInventoryService {
         );
     }
 
-    // ── PRIVATE: stock + alert helpers ──────────────────────────────────────
+    // ── PRIVATE: stock + alert helpers ───────────────────────────────────────
 
     private void refreshAlert(Long storeId, List<InventoryTicketLineDto> lines) {
         for (InventoryTicketLineDto line : lines) {
@@ -525,7 +518,18 @@ public class AdminInventoryServiceImpl implements AdminInventoryService {
         }
     }
 
+    /**
+     * Cập nhật alert cho một cặp (store, product).
+     * - minStock <= 0: không có ngưỡng cảnh báo → resolve alert nếu có.
+     * - stock > minStock: tồn kho ổn → resolve.
+     * - stock <= minStock: tạo hoặc cập nhật alert với severity tương ứng.
+     */
     private void updateAlert(Long storeId, Long productId, int stock, int minStock) {
+        if (minStock <= 0) {
+            // Không có ngưỡng tối thiểu → không cần cảnh báo
+            alertRepo.resolveAlert(storeId, productId);
+            return;
+        }
         if (stock > minStock) {
             alertRepo.resolveAlert(storeId, productId);
         } else {
@@ -535,8 +539,8 @@ public class AdminInventoryServiceImpl implements AdminInventoryService {
     }
 
     private String computeSeverity(int stock, int minStock) {
-        if (stock == 0) return "critical";
-        if (stock <= minStock / 2) return "warning";
+        if (stock == 0)              return "critical";
+        if (stock <= minStock / 2)   return "warning";
         return "info";
     }
 

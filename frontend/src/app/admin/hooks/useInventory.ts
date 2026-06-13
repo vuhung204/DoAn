@@ -124,6 +124,7 @@ export function useInventory() {
     finally { setTrfLoading(false); }
   }, [transferPage]);
 
+  // ── loadAlerts: chỉ fetch, không sync — dùng nội bộ sau các action ──────
   const loadAlerts = useCallback(async () => {
     setAltLoading(true);
     try {
@@ -139,19 +140,21 @@ export function useInventory() {
   useEffect(() => { loadExports();  }, [loadExports]);
   useEffect(() => { loadTransfers();}, [loadTransfers]);
 
-  // ── Auto sync alerts khi alertSeverity thay đổi (hoặc lần đầu mount) ──
+  // ── Alerts: sync trước rồi fetch — tách try/catch để fetch luôn chạy dù sync lỗi
   useEffect(() => {
     const run = async () => {
       setAltLoading(true);
       try {
         await syncAlerts();
+      } catch { /* sync thất bại không sao, vẫn tiếp tục fetch */ }
+      try {
         const data = await fetchAlerts({ severity: alertSeverity });
         setAlerts(data);
       } catch { /* fail silently */ }
       finally { setAltLoading(false); }
     };
     run();
-  }, [alertSeverity]);
+  }, [alertSeverity]); // chạy lại khi đổi filter severity
 
   // ── Actions ──────────────────────────────────────────────────────────────
 

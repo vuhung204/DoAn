@@ -211,12 +211,17 @@ function QuickImportModal({
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 
 export default function InventoryAlerts({ hook }: { hook: HookReturn }) {
-  const { alerts, alertsLoading, alertSeverity, setAlertSeverity, refresh, handleExport } = hook;
+  const {
+    alerts, alertsLoading, alertSeverity, setAlertSeverity,
+    handleExport, handleSyncAlerts, actionLoading,
+  } = hook;
 
   const [quickImportAlert, setQuickImportAlert] = useState<InventoryAlertDto | null>(null);
 
   const criticalCount = alerts.filter(a => a.severity === 'critical').length;
   const warningCount  = alerts.filter(a => a.severity === 'warning').length;
+
+  const isRefreshing = alertsLoading || actionLoading;
 
   return (
     <div className="space-y-5">
@@ -237,11 +242,12 @@ export default function InventoryAlerts({ hook }: { hook: HookReturn }) {
           <p className="text-gray-500 mt-1">Danh sách sản phẩm cần nhập bổ sung</p>
         </div>
         <div className="flex gap-2">
+          {/* Làm mới: gọi alerts/sync (qua handleSyncAlerts) rồi tải lại danh sách + overview */}
           <button
-            onClick={refresh} disabled={alertsLoading}
+            onClick={handleSyncAlerts} disabled={isRefreshing}
             className="flex items-center gap-1.5 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-bold disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${alertsLoading ? 'animate-spin' : ''}`} /> Làm mới
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} /> Làm mới
           </button>
           <button
             onClick={() => handleExport('ALERTS')}

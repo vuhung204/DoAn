@@ -20,11 +20,6 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
 
     Optional<StoreInventory> findByStoreIdAndProductId(Long storeId, Long productId);
 
-    /**
-     * Tăng/giảm tồn kho trực tiếp bằng SQL để tránh lost-update trong môi trường concurrent.
-     * quantityDelta > 0 → nhập hàng, < 0 → xuất hàng.
-     * Không cho phép quantity < 0.
-     */
     @Modifying
     @Query(value = """
             UPDATE store_inventory
@@ -163,6 +158,26 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
     }
 
     // ══════════════════════════════════════════════════════════════════════
+    // SYNC ALERTS — Cross join stores × products (kể cả chưa có row tồn kho)
+    // Trả về tất cả cặp (store, product) active, stock=0 nếu chưa có row.
+    // Object[]: [0]=store_id, [1]=product_id, [2]=quantity, [3]=min_quantity
+    // ══════════════════════════════════════════════════════════════════════
+
+    @Query(value = """
+            SELECT s.store_id, p.product_id,
+                   COALESCE(si.quantity,     0) AS quantity,
+                   COALESCE(si.min_quantity, 5) AS min_quantity
+            FROM stores s
+            CROSS JOIN products p
+            LEFT JOIN store_inventory si
+                   ON si.store_id   = s.store_id
+                  AND si.product_id = p.product_id
+            WHERE s.is_active = 1
+              AND p.is_active = 1
+            """, nativeQuery = true)
+    List<Object[]> findAllStoreProductPairs();
+
+    // ══════════════════════════════════════════════════════════════════════
     // Product Report — overstock rows
     // ══════════════════════════════════════════════════════════════════════
 
@@ -281,8 +296,6 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
             Pageable pageable
     );
 
-    // soldIds filter xử lý ở service layer (post-filter) thay vì trong query
-    // để tránh lỗi MySQL với NOT IN + nullable list
     default Page<Object[]> findDeadStockRows(
             List<Long> storeIds, List<Long> soldProductIds, Pageable pageable) {
         if (storeIds == null || storeIds.isEmpty()) return findDeadStockRowsAllStores(pageable);
@@ -318,7 +331,7 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // PRODUCT MGMT — Tổng tồn kho của một sản phẩm (tất cả chi nhánh)
+    // PRODUCT MGMT
     // ══════════════════════════════════════════════════════════════════════
 
     @Query("SELECT COALESCE(SUM(si.quantity), 0) FROM StoreInventory si WHERE si.product.id = :productId")
@@ -326,10 +339,6 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
 
     @Query("SELECT COALESCE(MIN(si.minQuantity), 0) FROM StoreInventory si WHERE si.product.id = :productId")
     Integer minStockByProduct(@Param("productId") Long productId);
-
-    // ══════════════════════════════════════════════════════════════════════
-    // PRODUCT MGMT — Tổng tồn kho cho nhiều product (batch, tránh N+1)
-    // ══════════════════════════════════════════════════════════════════════
 
     @Query(value = """
             SELECT si.product_id, SUM(si.quantity) AS total_stock
@@ -346,10 +355,6 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
             GROUP BY si.product_id
             """, nativeQuery = true)
     List<Object[]> minStockByProductIds(@Param("productIds") List<Long> productIds);
-
-    // ══════════════════════════════════════════════════════════════════════
-    // PRODUCT MGMT — Cập nhật tồn kho (tất cả chi nhánh hoặc 1 chi nhánh)
-    // ══════════════════════════════════════════════════════════════════════
 
     @Query("""
             SELECT si FROM StoreInventory si
@@ -383,13 +388,8 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
             @Param("minQuantity") Integer minQuantity
     );
 
-    // INVENTORY
     List<StoreInventory> findByStoreId(Long storeId);
 
-    /**
-     * Upsert: tăng qty nếu bản ghi đã tồn tại, tạo mới nếu chưa có.
-     * Dùng cho IMPORT — không cần kiểm tra âm.
-     */
     @Modifying
     @Query(value = """
             INSERT INTO store_inventory (store_id, product_id, quantity, min_quantity, updated_at)
@@ -404,10 +404,6 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
             @Param("qty")       int qty
     );
 
-    /**
-     * Danh sách tồn kho thấp: quantity <= min_quantity.
-     * Object[]: [0]=store_id, [1]=product_id, [2]=quantity, [3]=min_quantity
-     */
     @Query(value = """
             SELECT si.store_id, si.product_id, si.quantity, si.min_quantity
             FROM store_inventory si
@@ -417,11 +413,6 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
             """, nativeQuery = true)
     List<Object[]> findLowStock(@Param("storeId") Long storeId);
 
-    /**
-     * Tổng hợp tồn kho theo chi nhánh (cho BranchInventoryDto).
-     * Object[]: [0]=store_id, [1]=store_name, [2]=productCount,
-     *           [3]=totalQty, [4]=lowStockCount, [5]=inventoryValue
-     */
     @Query(value = """
             SELECT
                 s.store_id,
@@ -441,11 +432,6 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
             """, nativeQuery = true)
     List<Object[]> aggregateByBranch(@Param("storeId") Long storeId);
 
-    /**
-     * Danh sách sản phẩm kèm tồn kho tổng hợp (cho ProductInventoryDto).
-     * Object[]: [0]=product_id, [1]=sku, [2]=name, [3]=totalStock,
-     *           [4]=minQty, [5]=estimatedValue, [6]=isLowStock
-     */
     @Query(value = """
             SELECT
                 p.product_id,
@@ -477,11 +463,6 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
             @Param("offset")       int     offset
     );
 
-    /**
-     * FIXED: thêm GROUP BY trước HAVING (lỗi cũ thiếu GROUP BY khiến HAVING
-     * tính SUM/MIN trên TOÀN BỘ bảng thay vì theo từng sản phẩm, dẫn tới
-     * lowStockOnly=1 luôn trả COUNT=0).
-     */
     @Query(value = """
             SELECT COUNT(*) FROM (
                 SELECT p.product_id
@@ -503,7 +484,6 @@ public interface StoreInventoryRepository extends JpaRepository<StoreInventory, 
             @Param("lowStockOnly") int    lowStockOnly
     );
 
-    /** Stock của một sản phẩm theo từng chi nhánh. Object[]: [0]=store_id, [1]=quantity */
     @Query(value = """
             SELECT si.store_id, si.quantity
             FROM store_inventory si

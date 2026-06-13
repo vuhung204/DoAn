@@ -21,8 +21,8 @@ public interface InventoryAlertRepository extends JpaRepository<InventoryAlert, 
             JOIN FETCH a.store   s
             JOIN FETCH a.product p
             WHERE a.isResolved = false
-              AND (:storeId   IS NULL OR s.id            = :storeId)
-              AND (:severity  IS NULL OR a.severity      = :severity)
+              AND (:storeId   IS NULL OR a.store.id   = :storeId)
+              AND (:severity  IS NULL OR a.severity   = :severity)
             ORDER BY
                 CASE a.severity WHEN 'critical' THEN 1
                                 WHEN 'warning'  THEN 2
